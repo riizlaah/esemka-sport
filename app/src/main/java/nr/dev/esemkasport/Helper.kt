@@ -18,7 +18,9 @@ object Route {
     const val SIGNUP = "signup"
     const val HOME = "home"
     const val TEAM_DETAIL = "team_detail"
+    const val TEAM_DETAIL_FULL = "team_detail/{id}"
     const val PLAYER_DETAIL = "player_detail"
+    const val PLAYER_DETAIL_FULL = "player_detail/{id}"
 }
 
 data class HttpRequest(
@@ -264,6 +266,88 @@ object HttpClient {
         return players
     }
 
+    suspend fun getTeamById(id: Int): Team? {
+        val res = withContext(Dispatchers.IO) {
+            send(HttpRequest(
+                url = address + "api/teams/$id"
+            ))
+        }
+        if(res.code != 200 || res.body.isNullOrBlank()) return null
+        val obj = JSONObject(res.body)
+        return Team(
+            id = obj.getInt("id"),
+            name = obj.getString("name"),
+            about = obj.getString("about"),
+            kills = obj.getInt("kills"),
+            deaths = obj.getInt("deaths"),
+            assists = obj.getInt("assists"),
+            gold = obj.getInt("gold"),
+            damage = obj.getInt("damage"),
+            lordKills = obj.getInt("lordKills"),
+            tortoiseKills = obj.getInt("tortoiseKills"),
+            towerDestroy = obj.getInt("towerDestroy"),
+            logo500 = obj.getString("logo500"),
+            logo256 = obj.getString("logo256"),
+        )
+    }
+
+    suspend fun getTeamAchievements(teamId: Int): List<String> {
+        val res = withContext(Dispatchers.IO) {
+            send(HttpRequest(
+                url = address + "api/achievements/$teamId"
+            ))
+        }
+        if(res.code != 200 || res.body.isNullOrBlank()) return emptyList()
+        val jsonArr = JSONArray(res.body)
+        val arr = mutableListOf<String>()
+        for(i in 0 until jsonArr.length()) {
+            val obj = jsonArr.getJSONObject(i)
+            arr.add(obj.getString("name"))
+        }
+        return arr
+    }
+    suspend fun getPlayersInTeam(teamId: Int): List<Player> {
+        val res = withContext(Dispatchers.IO) {
+            send(HttpRequest(
+                url = address + "api/players/team/$teamId"
+            ))
+        }
+        if(res.code != 200 || res.body.isNullOrBlank()) return emptyList()
+        val jsonArr = JSONArray(res.body)
+        val players = mutableListOf<Player>()
+        for(i in 0 until jsonArr.length()) {
+            val obj = jsonArr.getJSONObject(i)
+            val teamObj = obj.getJSONObject("team")
+            val playerRoleObj = obj.getJSONObject("playerRole")
+            val team = Team(
+                id = teamObj.getInt("id"),
+                name = teamObj.getString("name"),
+                about = teamObj.getString("about"),
+                kills = teamObj.getInt("kills"),
+                deaths = teamObj.getInt("deaths"),
+                assists = teamObj.getInt("assists"),
+                gold = teamObj.getInt("gold"),
+                damage = teamObj.getInt("damage"),
+                lordKills = teamObj.getInt("lordKills"),
+                tortoiseKills = teamObj.getInt("tortoiseKills"),
+                towerDestroy = teamObj.getInt("towerDestroy"),
+                logo500 = teamObj.getString("logo500"),
+                logo256 = teamObj.getString("logo256"),
+            )
+            val playerRole = PlayerRole(id = playerRoleObj.getInt("id"), name = playerRoleObj.getString("name"))
+            players.add(Player(
+                id = obj.getInt("id"),
+                playerRoleId = obj.getInt("playerRoleId"),
+                teamId = obj.getInt("teamId"),
+                fullName = obj.getString("fullName"),
+                ign = obj.getString("ign"),
+                image = obj.getString("image"),
+                playerRole = playerRole,
+                team = team,
+            ))
+        }
+        return players
+    }
 }
 
 

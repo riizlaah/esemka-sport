@@ -26,11 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import nr.dev.esemkasport.ui.theme.EsemkaSportTheme
 
 class MainActivity : ComponentActivity() {
@@ -53,6 +56,15 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = Route.HOME) {
                             HomeScreen(controller, innerPadding)
+                        }
+                        composable(
+                            route = Route.TEAM_DETAIL_FULL,
+                            arguments = listOf(navArgument("id") {
+                                type = NavType.IntType
+                            })
+                        ) { backStackTrace ->
+                            val teamId = backStackTrace.arguments?.getInt("id") ?: 1
+                            TeamDetailScreen(controller, innerPadding, teamId)
                         }
                     }
                 }
