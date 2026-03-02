@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,9 +18,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -56,7 +59,6 @@ import java.time.format.DateTimeFormatter
 fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
     var datetime by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
-    var placeholder by remember { mutableStateOf("Cari nama tim...") }
     val tabs = listOf("Tim", "Pemain")
     var selectedTab by remember { mutableStateOf(tabs[0]) }
     var teams by remember { mutableStateOf(listOf<Team>()) }
@@ -100,13 +102,16 @@ fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
             .background(MaterialTheme.colorScheme.primary)
             .padding(padVal)
             .background(
-                MaterialTheme.colorScheme.tertiary
+                Color.White
             )
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .dropShadow(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp), Shadow(radius = 4.dp, color = Color(0x40000000)))
+                .clip(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp))
+                .background(Color.White)
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -140,10 +145,11 @@ fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
                             .padding(12.dp), verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(painterResource(R.drawable.search), contentDescription = "Search")
-                        Spacer(Modifier.width(8.dp))
-                        if (search.isEmpty()) {
-                            Text(placeholder, color = Color.Gray)
-                        } else {
+                        Spacer(Modifier.width(4.dp))
+                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+                            if (search.isEmpty()) {
+                                Text("Cari nama $selectedTab...", color = Color.Gray)
+                            }
                             tField()
                         }
                     }
@@ -153,23 +159,24 @@ fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .weight(1f)
-                    .padding(12.dp),
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                item(span = { GridItemSpan(2) }) {
+                    Spacer(Modifier.height(8.dp))
+                }
                 if (selectedTab == tabs[0]) {
                     items(filteredTeams) { team ->
                         Column(
                             Modifier
-                                .clip(corner(16.dp))
                                 .dropShadow(
                                     shape = corner(16.dp), shadow = Shadow(
-                                        radius = 10.dp,
-                                        spread = 6.dp,
+                                        radius = 4.dp,
                                         color = Color(0x40000000),
-                                        offset = DpOffset(x = 4.dp, 4.dp)
                                     )
                                 )
+                                .clip(corner(16.dp))
                                 .background(Color.White)
                                 .padding(16.dp)
                                 .clickable(onClick = {
@@ -190,40 +197,11 @@ fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
                     }
                 } else {
                     items(filteredPlayers) { player ->
-                        Column(
-                            Modifier
-                                .clip(corner(16.dp))
-                                .dropShadow(
-                                    shape = corner(16.dp), shadow = Shadow(
-                                        radius = 10.dp,
-                                        spread = 6.dp,
-                                        color = Color(0x40000000),
-                                        offset = DpOffset(x = 4.dp, 4.dp)
-                                    )
-                                )
-                                .background(Color.White)
-                                .padding(16.dp)
-                                .clickable(onClick = {
-                                    controller.navigate(Route.PLAYER_DETAIL + "/${player.id}")
-                                }),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            NetworkImage(
-                                HttpClient.address + "players/${player.image}",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                contentScale = ContentScale.Fit
-                            )
-                            Spacer(Modifier.height(12.dp))
-                            Text(
-                                "${player.ign} (${player.team.name})",
-                                fontWeight = FontWeight.Black
-                            )
-                            Spacer(Modifier.height(6.dp))
-                            Text(player.playerRole.name, color = Color.Gray)
-                        }
+                        PlayerCard(player, controller)
                     }
+                }
+                item(span = { GridItemSpan(2) }) {
+                    Spacer(Modifier.height(8.dp))
                 }
             }
         }
@@ -286,25 +264,7 @@ fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamI
                 MaterialTheme.colorScheme.tertiary
             )
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painterResource(R.drawable.left),
-                tint = Color.Black,
-                contentDescription = "Back",
-                modifier = Modifier.clickable(onClick = { controller.popBackStack() })
-            )
-            Text(
-                "Detail Tim",
-                Modifier.weight(1f),
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center
-            )
-        }
+        BackHeader(controller, "Detail Tim", TextAlign.Left)
         Column(Modifier.weight(1f)) {
             if (team == null) return@Column
             when (selectedTab) {
@@ -401,39 +361,7 @@ fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamI
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(players) { player ->
-                            Column(
-                                Modifier
-                                    .clip(corner(16.dp))
-                                    .dropShadow(
-                                        shape = corner(16.dp), shadow = Shadow(
-                                            radius = 10.dp,
-                                            spread = 6.dp,
-                                            color = Color(0x40000000),
-                                            offset = DpOffset(x = 4.dp, 4.dp)
-                                        )
-                                    )
-                                    .background(Color.White)
-                                    .padding(16.dp)
-                                    .clickable(onClick = {
-                                        controller.navigate(Route.PLAYER_DETAIL + "/${player.id}")
-                                    }),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                NetworkImage(
-                                    HttpClient.address + "players/${player.image}",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                                Spacer(Modifier.height(12.dp))
-                                Text(
-                                    "${player.ign} (${player.team.name})",
-                                    fontWeight = FontWeight.Black
-                                )
-                                Spacer(Modifier.height(6.dp))
-                                Text(player.playerRole.name, color = Color.Gray)
-                            }
+                            PlayerCard(player, controller)
                         }
                     }
                 }
@@ -473,6 +401,43 @@ fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamI
 }
 
 @Composable
+fun PlayerCard(player: Player, controller: NavHostController) {
+    Column(
+        Modifier
+            .dropShadow(
+                shape = corner(16.dp), shadow = Shadow(
+                    radius = 4.dp,
+                    color = Color(0x40000000),
+                )
+            )
+            .clip(corner(16.dp))
+            .background(Color.White)
+            .padding(16.dp)
+            .clickable(onClick = {
+                controller.navigate(Route.PLAYER_DETAIL + "/${player.id}")
+            }),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        NetworkImage(
+            HttpClient.address + "players/${player.image}",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            contentScale = ContentScale.Fit
+        )
+        Spacer(Modifier.height(12.dp))
+        Text(
+            "${player.ign} (${player.team.name})",
+            fontWeight = FontWeight.Black,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(player.playerRole.name, color = Color.Gray, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
 fun PlayerDetailScreen(controller: NavHostController, padVal: PaddingValues, playerId: Int) {
     var player by remember { mutableStateOf<Player?>(null) }
 
@@ -492,25 +457,7 @@ fun PlayerDetailScreen(controller: NavHostController, padVal: PaddingValues, pla
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painterResource(R.drawable.left),
-                tint = Color.Black,
-                contentDescription = "Back",
-                modifier = Modifier.clickable(onClick = { controller.popBackStack() })
-            )
-            Text(
-                "Detail Pemain",
-                Modifier.weight(1f),
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center
-            )
-        }
+        BackHeader(controller, "Detail Pemain", TextAlign.Left)
         if(player == null) return@Column
         LazyColumn(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             item {
@@ -538,15 +485,14 @@ fun MaxWidthRow(content: @Composable () -> Unit) {
 
 @Composable
 fun StatCard(painter: Painter, text: String, modifier: Modifier = Modifier) {
-    Column(modifier.clip(corner(16.dp))
+    Column(modifier
         .dropShadow(
             shape = corner(16.dp), shadow = Shadow(
-                radius = 10.dp,
-                spread = 6.dp,
+                radius = 4.dp,
                 color = Color(0x40000000),
-                offset = DpOffset(x = 4.dp, 4.dp)
             )
         )
+        .clip(corner(16.dp))
         .background(Color.White)
         .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally

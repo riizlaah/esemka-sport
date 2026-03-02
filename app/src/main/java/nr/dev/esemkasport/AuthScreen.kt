@@ -50,13 +50,14 @@ fun PasswordField(state: TextFieldState, modifier: Modifier, placeholder: String
         modifier = modifier,
         state = state,
         decorator = {tField ->
-            Row(Modifier.fillMaxWidth().border(1.dp, MaterialTheme.colorScheme.primary,
+            Box(Modifier.fillMaxWidth().border(1.dp, MaterialTheme.colorScheme.primary,
                 RoundedCornerShape(12.dp)
-            ).padding(12.dp)) {
+            ).padding(12.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                tField()
                 if(state.text.isEmpty()) {
                     Text(placeholder, color = Color.Gray)
-                } else {
-                    tField()
                 }
             }
         }
@@ -71,12 +72,9 @@ fun LoginScreen(modifier: Modifier, controller: NavHostController) {
     var errMsg by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(R.drawable.left), tint = Color.Black, contentDescription = "Back", modifier = Modifier.clickable(onClick = {controller.popBackStack()}))
-            Text("Sign In", Modifier.weight(1f), fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-        }
+        BackHeader(controller, "Sign In")
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
-            Text("Haloo, Selamat datang kembali!", fontWeight = FontWeight.Medium)
+            Text("Haloo, Selamat datang kembali!", fontWeight = FontWeight.SemiBold)
             Text("Kami sangat senang bertemu dengan kamu lagi")
             if(errMsg.isNotEmpty()) {
                 Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, text = errMsg, color = Color.Red)
@@ -129,7 +127,7 @@ fun LoginScreen(modifier: Modifier, controller: NavHostController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if(loading) {
-                    CircularProgressIndicator(Modifier.size(48.dp))
+                    CircularProgressIndicator(Modifier.size(32.dp), color = Color.White)
                     return@Button
                 }
                 Text("Sign In")
@@ -160,12 +158,9 @@ fun SignUpScreen(modifier: Modifier, controller: NavHostController) {
     var errMsg by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(R.drawable.left), tint = Color.Black, contentDescription = "Back", modifier = Modifier.clickable(onClick = {controller.popBackStack()}))
-            Text("Sign Up", Modifier.weight(1f), fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-        }
+        BackHeader(controller, "Sign Up")
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
-            Text("Halo!", fontWeight = FontWeight.Medium)
+            Text("Halo!", fontWeight = FontWeight.SemiBold)
             Text("Buat akun baru!")
             if(errMsg.isNotEmpty()) {
                 Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, text = errMsg, color = Color.Red)
@@ -259,7 +254,7 @@ fun SignUpScreen(modifier: Modifier, controller: NavHostController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if(loading) {
-                    CircularProgressIndicator(Modifier.size(48.dp))
+                    CircularProgressIndicator(Modifier.size(32.dp), color = Color.White)
                     return@Button
                 }
                 Text("Sign In")
