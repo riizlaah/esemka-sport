@@ -13,16 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 
 
@@ -68,9 +66,11 @@ fun NetworkImage(
                     ),
                     label = "color1"
                 )
-                Box(Modifier
-                    .fillMaxSize()
-                    .background(color))
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(color)
+                )
             }
 
             isError -> {
@@ -101,7 +101,7 @@ class ImageLoader {
     suspend fun loadImg(url: String): ImageBitmap? {
         caches[url]?.let { return it }
         val img = HttpClient.fetchImg(url)
-        if(img != null) caches[url] = img
+        if (img != null) caches[url] = img
         return img
     }
 

@@ -108,7 +108,10 @@ fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .dropShadow(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp), Shadow(radius = 4.dp, color = Color(0x40000000)))
+                .dropShadow(
+                    RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp),
+                    Shadow(radius = 4.dp, color = Color(0x40000000))
+                )
                 .clip(RoundedCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp))
                 .background(Color.White)
                 .padding(16.dp),
@@ -277,10 +280,19 @@ fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamI
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         item {
-                            NetworkImage(HttpClient.address + "logos/${team!!.logo500}", modifier = Modifier.fillMaxWidth(), contentScale = ContentScale.Fit, contentDescription = team!!.name)
+                            NetworkImage(
+                                HttpClient.address + "logos/${team!!.logo500}",
+                                modifier = Modifier.fillMaxWidth(),
+                                contentScale = ContentScale.Fit,
+                                contentDescription = team!!.name
+                            )
                         }
                         item {
-                            Text(team!!.name, fontWeight = FontWeight.Black, fontSize = MaterialTheme.typography.displayMedium.fontSize)
+                            Text(
+                                team!!.name,
+                                fontWeight = FontWeight.Black,
+                                fontSize = MaterialTheme.typography.displayMedium.fontSize
+                            )
                         }
                         item {
                             Text(team!!.about, color = Color.Gray)
@@ -327,30 +339,63 @@ fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamI
                     ) {
                         item {
                             MaxWidthRow {
-                                StatCard(painterResource(R.drawable.deaths), "${team!!.deaths} Deaths", Modifier.weight(1f))
-                                StatCard(painterResource(R.drawable.kills), "${team!!.kills} Kills", Modifier.weight(1f))
+                                StatCard(
+                                    painterResource(R.drawable.deaths),
+                                    "${team!!.deaths} Deaths",
+                                    Modifier.weight(1f)
+                                )
+                                StatCard(
+                                    painterResource(R.drawable.kills),
+                                    "${team!!.kills} Kills",
+                                    Modifier.weight(1f)
+                                )
                             }
                         }
                         item {
                             MaxWidthRow {
-                                StatCard(painterResource(R.drawable.assists), "${team!!.assists} Assists", Modifier.weight(1f))
-                                StatCard(painterResource(R.drawable.gold), "${team!!.gold} Gold", Modifier.weight(1f))
+                                StatCard(
+                                    painterResource(R.drawable.assists),
+                                    "${team!!.assists} Assists",
+                                    Modifier.weight(1f)
+                                )
+                                StatCard(
+                                    painterResource(R.drawable.gold),
+                                    "${team!!.gold} Gold",
+                                    Modifier.weight(1f)
+                                )
                             }
                         }
                         item {
                             MaxWidthRow {
-                                StatCard(painterResource(R.drawable.damage), "${team!!.damage} Damage", Modifier.weight(1f))
-                                StatCard(painterResource(R.drawable.lord_kills), "${team!!.lordKills} Lord Kills", Modifier.weight(1f))
+                                StatCard(
+                                    painterResource(R.drawable.damage),
+                                    "${team!!.damage} Damage",
+                                    Modifier.weight(1f)
+                                )
+                                StatCard(
+                                    painterResource(R.drawable.lord_kills),
+                                    "${team!!.lordKills} Lord Kills",
+                                    Modifier.weight(1f)
+                                )
                             }
                         }
                         item {
                             MaxWidthRow {
-                                StatCard(painterResource(R.drawable.tortoise_kills), "${team!!.deaths} Tortoise Kills", Modifier.weight(1f))
-                                StatCard(painterResource(R.drawable.towe_destroy), "${team!!.towerDestroy} Tower Destroy", Modifier.weight(1f))
+                                StatCard(
+                                    painterResource(R.drawable.tortoise_kills),
+                                    "${team!!.deaths} Tortoise Kills",
+                                    Modifier.weight(1f)
+                                )
+                                StatCard(
+                                    painterResource(R.drawable.towe_destroy),
+                                    "${team!!.towerDestroy} Tower Destroy",
+                                    Modifier.weight(1f)
+                                )
                             }
                         }
                     }
                 }
+
                 tabs[3] -> {
                     LazyVerticalGrid(
                         modifier = Modifier
@@ -433,7 +478,12 @@ fun PlayerCard(player: Player, controller: NavHostController) {
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(6.dp))
-        Text(player.playerRole.name, color = Color.Gray, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+        Text(
+            player.playerRole.name,
+            color = Color.Gray,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -442,7 +492,7 @@ fun PlayerDetailScreen(controller: NavHostController, padVal: PaddingValues, pla
     var player by remember { mutableStateOf<Player?>(null) }
 
     LaunchedEffect(Unit) {
-        if(player == null) {
+        if (player == null) {
             player = HttpClient.getPlayerById(playerId)
         }
     }
@@ -458,19 +508,39 @@ fun PlayerDetailScreen(controller: NavHostController, padVal: PaddingValues, pla
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BackHeader(controller, "Detail Pemain", TextAlign.Left)
-        if(player == null) return@Column
-        LazyColumn(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        if (player == null) return@Column
+        LazyColumn(
+            Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             item {
                 NetworkImage(
                     url = HttpClient.address + "players/${player!!.image}",
-                    modifier = Modifier.fillMaxWidth().height(400.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp),
                     contentScale = ContentScale.Fit
                 )
             }
             item {
                 val text = player!!.fullName + "\n(${player!!.team.name} ${player!!.ign})"
-                Text(text, fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.displaySmall.fontSize, textAlign = TextAlign.Center, lineHeight = MaterialTheme.typography.displaySmall.lineHeight)
-                Text(player!!.playerRole.name, fontWeight = FontWeight.Medium, color = Color.Gray, fontSize = MaterialTheme.typography.headlineSmall.fontSize, textAlign = TextAlign.Center)
+                Text(
+                    text,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = MaterialTheme.typography.displaySmall.fontSize,
+                    textAlign = TextAlign.Center,
+                    lineHeight = MaterialTheme.typography.displaySmall.lineHeight
+                )
+                Text(
+                    player!!.playerRole.name,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Gray,
+                    fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -485,19 +555,30 @@ fun MaxWidthRow(content: @Composable () -> Unit) {
 
 @Composable
 fun StatCard(painter: Painter, text: String, modifier: Modifier = Modifier) {
-    Column(modifier
-        .dropShadow(
-            shape = corner(16.dp), shadow = Shadow(
-                radius = 4.dp,
-                color = Color(0x40000000),
+    Column(
+        modifier
+            .dropShadow(
+                shape = corner(16.dp), shadow = Shadow(
+                    radius = 4.dp,
+                    color = Color(0x40000000),
+                )
             )
-        )
-        .clip(corner(16.dp))
-        .background(Color.White)
-        .padding(horizontal = 16.dp, vertical = 8.dp),
+            .clip(corner(16.dp))
+            .background(Color.White)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(painter, contentDescription = text, modifier = Modifier.padding(horizontal = 48.dp, vertical = 16.dp))
-        Text(text, fontWeight = FontWeight.Medium, color = Color.Gray, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Image(
+            painter,
+            contentDescription = text,
+            modifier = Modifier.padding(horizontal = 48.dp, vertical = 16.dp)
+        )
+        Text(
+            text,
+            fontWeight = FontWeight.Medium,
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

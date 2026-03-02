@@ -19,14 +19,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -34,10 +32,7 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -54,7 +49,11 @@ class MainActivity : ComponentActivity() {
             EsemkaSportTheme {
                 val controller = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val mod = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary).padding(innerPadding).background(Color.White)
+                    val mod = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(innerPadding)
+                        .background(Color.White)
                     NavHost(navController = controller, startDestination = Route.START) {
                         composable(route = Route.START) {
                             StartScreen(controller)
@@ -95,11 +94,20 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun StartScreen(controller: NavHostController) {
-    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)) {
-        Image(painterResource(R.drawable.esemka_esport_logo_large), contentDescription = "Logo", modifier = Modifier.align(Alignment.Center))
-        Column(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(36.dp)) {
+    Box(Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.primary)) {
+        Image(
+            painterResource(R.drawable.esemka_esport_logo_large),
+            contentDescription = "Logo",
+            modifier = Modifier.align(Alignment.Center)
+        )
+        Column(Modifier
+            .align(Alignment.BottomStart)
+            .fillMaxWidth()
+            .padding(36.dp)) {
             Button(
-                onClick = {controller.navigate(Route.LOGIN)},
+                onClick = { controller.navigate(Route.LOGIN) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
@@ -107,7 +115,7 @@ fun StartScreen(controller: NavHostController) {
                 Text("Sign In")
             }
             TextButton(
-                onClick = {controller.navigate(Route.SIGNUP)},
+                onClick = { controller.navigate(Route.SIGNUP) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
@@ -120,7 +128,11 @@ fun StartScreen(controller: NavHostController) {
 }
 
 @Composable
-fun BackHeader(controller: NavHostController, text: String, textAlign: TextAlign = TextAlign.Center) {
+fun BackHeader(
+    controller: NavHostController,
+    text: String,
+    textAlign: TextAlign = TextAlign.Center
+) {
     Row(
         Modifier
             .fillMaxWidth()
