@@ -204,7 +204,7 @@ fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
                                 .background(Color.White)
                                 .padding(16.dp)
                                 .clickable(onClick = {
-
+                                    controller.navigate(Route.PLAYER_DETAIL + "/${player.id}")
                                 }),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -415,7 +415,7 @@ fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamI
                                     .background(Color.White)
                                     .padding(16.dp)
                                     .clickable(onClick = {
-
+                                        controller.navigate(Route.PLAYER_DETAIL + "/${player.id}")
                                     }),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
@@ -467,6 +467,63 @@ fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamI
                         Text(name)
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun PlayerDetailScreen(controller: NavHostController, padVal: PaddingValues, playerId: Int) {
+    var player by remember { mutableStateOf<Player?>(null) }
+
+    LaunchedEffect(Unit) {
+        if(player == null) {
+            player = HttpClient.getPlayerById(playerId)
+        }
+    }
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(padVal)
+            .background(
+                MaterialTheme.colorScheme.tertiary
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painterResource(R.drawable.left),
+                tint = Color.Black,
+                contentDescription = "Back",
+                modifier = Modifier.clickable(onClick = { controller.popBackStack() })
+            )
+            Text(
+                "Detail Pemain",
+                Modifier.weight(1f),
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center
+            )
+        }
+        if(player == null) return@Column
+        LazyColumn(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            item {
+                NetworkImage(
+                    url = HttpClient.address + "players/${player!!.image}",
+                    modifier = Modifier.fillMaxWidth().height(400.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
+            item {
+                val text = player!!.fullName + "\n(${player!!.team.name} ${player!!.ign})"
+                Text(text, fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.displaySmall.fontSize, textAlign = TextAlign.Center, lineHeight = MaterialTheme.typography.displaySmall.lineHeight)
+                Text(player!!.playerRole.name, fontWeight = FontWeight.Medium, color = Color.Gray, fontSize = MaterialTheme.typography.headlineSmall.fontSize, textAlign = TextAlign.Center)
             }
         }
     }

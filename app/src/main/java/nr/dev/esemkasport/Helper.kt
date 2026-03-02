@@ -91,7 +91,7 @@ object HttpClient {
             conn.connectTimeout = req.timeout
 
             req.headers.forEach { (k, v) -> conn.setRequestProperty(k, v) }
-            if(req.body != null && req.method in listOf("POST", "PUT", "PATCH")) {
+            if (req.body != null && req.method in listOf("POST", "PUT", "PATCH")) {
                 conn.doOutput = true
                 conn.getOutputStream().buffered().use { it.write(req.body.toByteArray()) }
             }
@@ -99,14 +99,14 @@ object HttpClient {
             val code = conn.responseCode
             var body: String? = null
             var bytes: ByteArray? = null
-            if(getByte) {
-                bytes = if(code in 200..299) {
+            if (getByte) {
+                bytes = if (code in 200..299) {
                     conn.getInputStream().buffered().use { it.readBytes() }
                 } else {
-                    conn.errorStream?.buffered()?.use {it.readBytes()}
+                    conn.errorStream?.buffered()?.use { it.readBytes() }
                 }
             } else {
-                body = if(code in 200..299) {
+                body = if (code in 200..299) {
                     conn.getInputStream().bufferedReader().use { it.readText() }
                 } else {
                     conn.errorStream?.bufferedReader()?.use { it.readText() }
@@ -133,7 +133,7 @@ object HttpClient {
         return withContext(Dispatchers.IO) {
             try {
                 val res = send(HttpRequest(url = url), true)
-                if(res.code == 200 && res.bytes != null) {
+                if (res.code == 200 && res.bytes != null) {
                     val bitmap = BitmapFactory.decodeByteArray(res.bytes, 0, res.bytes.size)
                     bitmap.asImageBitmap()
                 } else {
@@ -151,14 +151,16 @@ object HttpClient {
     suspend fun login(username: String, password: String): Int {
         val body = """{"usernameOrEmail": "$username", "password": "$password"}"""
         val res = withContext(Dispatchers.IO) {
-            send(HttpRequest(
-                url = address + "api/sign-in",
-                method = "POST",
-                body = body,
-                headers = mapOf("content-type" to "application/json")
-            ))
+            send(
+                HttpRequest(
+                    url = address + "api/sign-in",
+                    method = "POST",
+                    body = body,
+                    headers = mapOf("content-type" to "application/json")
+                )
+            )
         }
-        if(res.code == 200 && res.body != null) {
+        if (res.code == 200 && res.body != null) {
             val json = JSONObject(res.body)
             user = User(
                 id = json.getInt("id"),
@@ -170,17 +172,26 @@ object HttpClient {
         return res.code
     }
 
-    suspend fun signup(username: String, fullName: String, email: String, phoneNumber: String, password: String): Int {
-        val body = """{"username": "$username", "fullName": "$fullName", "email": "$email", "phoneNumber": "$phoneNumber", "password": "$password"}"""
+    suspend fun signup(
+        username: String,
+        fullName: String,
+        email: String,
+        phoneNumber: String,
+        password: String
+    ): Int {
+        val body =
+            """{"username": "$username", "fullName": "$fullName", "email": "$email", "phoneNumber": "$phoneNumber", "password": "$password"}"""
         val res = withContext(Dispatchers.IO) {
-            send(HttpRequest(
-                url = address + "api/sign-up",
-                method = "POST",
-                body = body,
-                headers = mapOf("content-type" to "application/json")
-            ))
+            send(
+                HttpRequest(
+                    url = address + "api/sign-up",
+                    method = "POST",
+                    body = body,
+                    headers = mapOf("content-type" to "application/json")
+                )
+            )
         }
-        if(res.code == 200 && res.body != null) {
+        if (res.code == 200 && res.body != null) {
             val json = JSONObject(res.body)
             user = User(
                 id = json.getInt("id"),
@@ -195,44 +206,50 @@ object HttpClient {
 
     suspend fun getTeams(): List<Team> {
         val res = withContext(Dispatchers.IO) {
-            send(HttpRequest(
-                url = address + "api/teams"
-            ))
+            send(
+                HttpRequest(
+                    url = address + "api/teams"
+                )
+            )
         }
-        if(res.code != 200 || res.body.isNullOrBlank()) return emptyList()
+        if (res.code != 200 || res.body.isNullOrBlank()) return emptyList()
         val jsonArr = JSONArray(res.body)
         val teams = mutableListOf<Team>()
-        for(i in 0 until jsonArr.length()) {
+        for (i in 0 until jsonArr.length()) {
             val obj = jsonArr.getJSONObject(i)
-            teams.add(Team(
-                id = obj.getInt("id"),
-                name = obj.getString("name"),
-                about = obj.getString("about"),
-                kills = obj.getInt("kills"),
-                deaths = obj.getInt("deaths"),
-                assists = obj.getInt("assists"),
-                gold = obj.getInt("gold"),
-                damage = obj.getInt("damage"),
-                lordKills = obj.getInt("lordKills"),
-                tortoiseKills = obj.getInt("tortoiseKills"),
-                towerDestroy = obj.getInt("towerDestroy"),
-                logo500 = obj.getString("logo500"),
-                logo256 = obj.getString("logo256"),
-            ))
+            teams.add(
+                Team(
+                    id = obj.getInt("id"),
+                    name = obj.getString("name"),
+                    about = obj.getString("about"),
+                    kills = obj.getInt("kills"),
+                    deaths = obj.getInt("deaths"),
+                    assists = obj.getInt("assists"),
+                    gold = obj.getInt("gold"),
+                    damage = obj.getInt("damage"),
+                    lordKills = obj.getInt("lordKills"),
+                    tortoiseKills = obj.getInt("tortoiseKills"),
+                    towerDestroy = obj.getInt("towerDestroy"),
+                    logo500 = obj.getString("logo500"),
+                    logo256 = obj.getString("logo256"),
+                )
+            )
         }
         return teams
     }
 
     suspend fun getPlayers(): List<Player> {
         val res = withContext(Dispatchers.IO) {
-            send(HttpRequest(
-                url = address + "api/players"
-            ))
+            send(
+                HttpRequest(
+                    url = address + "api/players"
+                )
+            )
         }
-        if(res.code != 200 || res.body.isNullOrBlank()) return emptyList()
+        if (res.code != 200 || res.body.isNullOrBlank()) return emptyList()
         val jsonArr = JSONArray(res.body)
         val players = mutableListOf<Player>()
-        for(i in 0 until jsonArr.length()) {
+        for (i in 0 until jsonArr.length()) {
             val obj = jsonArr.getJSONObject(i)
             val teamObj = obj.getJSONObject("team")
             val playerRoleObj = obj.getJSONObject("playerRole")
@@ -251,28 +268,74 @@ object HttpClient {
                 logo500 = teamObj.getString("logo500"),
                 logo256 = teamObj.getString("logo256"),
             )
-            val playerRole = PlayerRole(id = playerRoleObj.getInt("id"), name = playerRoleObj.getString("name"))
-            players.add(Player(
-                id = obj.getInt("id"),
-                playerRoleId = obj.getInt("playerRoleId"),
-                teamId = obj.getInt("teamId"),
-                fullName = obj.getString("fullName"),
-                ign = obj.getString("ign"),
-                image = obj.getString("image"),
-                playerRole = playerRole,
-                team = team,
-            ))
+            val playerRole =
+                PlayerRole(id = playerRoleObj.getInt("id"), name = playerRoleObj.getString("name"))
+            players.add(
+                Player(
+                    id = obj.getInt("id"),
+                    playerRoleId = obj.getInt("playerRoleId"),
+                    teamId = obj.getInt("teamId"),
+                    fullName = obj.getString("fullName"),
+                    ign = obj.getString("ign"),
+                    image = obj.getString("image"),
+                    playerRole = playerRole,
+                    team = team,
+                )
+            )
         }
         return players
     }
 
+    suspend fun getPlayerById(playerId: Int): Player? {
+        val res = withContext(Dispatchers.IO) {
+            send(
+                HttpRequest(
+                    url = address + "api/players/$playerId"
+                )
+            )
+        }
+        if (res.code != 200 || res.body.isNullOrBlank()) return null
+        val obj = JSONObject(res.body)
+        val teamObj = obj.getJSONObject("team")
+        val playerRoleObj = obj.getJSONObject("playerRole")
+        val team = Team(
+            id = teamObj.getInt("id"),
+            name = teamObj.getString("name"),
+            about = teamObj.getString("about"),
+            kills = teamObj.getInt("kills"),
+            deaths = teamObj.getInt("deaths"),
+            assists = teamObj.getInt("assists"),
+            gold = teamObj.getInt("gold"),
+            damage = teamObj.getInt("damage"),
+            lordKills = teamObj.getInt("lordKills"),
+            tortoiseKills = teamObj.getInt("tortoiseKills"),
+            towerDestroy = teamObj.getInt("towerDestroy"),
+            logo500 = teamObj.getString("logo500"),
+            logo256 = teamObj.getString("logo256"),
+        )
+        val playerRole =
+            PlayerRole(id = playerRoleObj.getInt("id"), name = playerRoleObj.getString("name"))
+        return Player(
+            id = obj.getInt("id"),
+            playerRoleId = obj.getInt("playerRoleId"),
+            teamId = obj.getInt("teamId"),
+            fullName = obj.getString("fullName"),
+            ign = obj.getString("ign"),
+            image = obj.getString("image"),
+            playerRole = playerRole,
+            team = team,
+        )
+    }
+
     suspend fun getTeamById(id: Int): Team? {
         val res = withContext(Dispatchers.IO) {
-            send(HttpRequest(
-                url = address + "api/teams/$id"
-            ))
+            send(
+                HttpRequest(
+                    url = address + "api/teams/$id"
+                )
+            )
         }
-        if(res.code != 200 || res.body.isNullOrBlank()) return null
+        if (res.code != 200 || res.body.isNullOrBlank()) return null
         val obj = JSONObject(res.body)
         return Team(
             id = obj.getInt("id"),
@@ -293,29 +356,34 @@ object HttpClient {
 
     suspend fun getTeamAchievements(teamId: Int): List<String> {
         val res = withContext(Dispatchers.IO) {
-            send(HttpRequest(
-                url = address + "api/achievements/$teamId"
-            ))
+            send(
+                HttpRequest(
+                    url = address + "api/achievements/$teamId"
+                )
+            )
         }
-        if(res.code != 200 || res.body.isNullOrBlank()) return emptyList()
+        if (res.code != 200 || res.body.isNullOrBlank()) return emptyList()
         val jsonArr = JSONArray(res.body)
         val arr = mutableListOf<String>()
-        for(i in 0 until jsonArr.length()) {
+        for (i in 0 until jsonArr.length()) {
             val obj = jsonArr.getJSONObject(i)
             arr.add(obj.getString("name"))
         }
         return arr
     }
+
     suspend fun getPlayersInTeam(teamId: Int): List<Player> {
         val res = withContext(Dispatchers.IO) {
-            send(HttpRequest(
-                url = address + "api/players/team/$teamId"
-            ))
+            send(
+                HttpRequest(
+                    url = address + "api/players/team/$teamId"
+                )
+            )
         }
-        if(res.code != 200 || res.body.isNullOrBlank()) return emptyList()
+        if (res.code != 200 || res.body.isNullOrBlank()) return emptyList()
         val jsonArr = JSONArray(res.body)
         val players = mutableListOf<Player>()
-        for(i in 0 until jsonArr.length()) {
+        for (i in 0 until jsonArr.length()) {
             val obj = jsonArr.getJSONObject(i)
             val teamObj = obj.getJSONObject("team")
             val playerRoleObj = obj.getJSONObject("playerRole")
@@ -334,17 +402,20 @@ object HttpClient {
                 logo500 = teamObj.getString("logo500"),
                 logo256 = teamObj.getString("logo256"),
             )
-            val playerRole = PlayerRole(id = playerRoleObj.getInt("id"), name = playerRoleObj.getString("name"))
-            players.add(Player(
-                id = obj.getInt("id"),
-                playerRoleId = obj.getInt("playerRoleId"),
-                teamId = obj.getInt("teamId"),
-                fullName = obj.getString("fullName"),
-                ign = obj.getString("ign"),
-                image = obj.getString("image"),
-                playerRole = playerRole,
-                team = team,
-            ))
+            val playerRole =
+                PlayerRole(id = playerRoleObj.getInt("id"), name = playerRoleObj.getString("name"))
+            players.add(
+                Player(
+                    id = obj.getInt("id"),
+                    playerRoleId = obj.getInt("playerRoleId"),
+                    teamId = obj.getInt("teamId"),
+                    fullName = obj.getString("fullName"),
+                    ign = obj.getString("ign"),
+                    image = obj.getString("image"),
+                    playerRole = playerRole,
+                    team = team,
+                )
+            )
         }
         return players
     }

@@ -66,6 +66,15 @@ class MainActivity : ComponentActivity() {
                             val teamId = backStackTrace.arguments?.getInt("id") ?: 1
                             TeamDetailScreen(controller, innerPadding, teamId)
                         }
+                        composable(
+                            route = Route.PLAYER_DETAIL_FULL,
+                            arguments = listOf(navArgument("id") {
+                                type = NavType.IntType
+                            })
+                        ) { backStackTrace ->
+                            val playerId = backStackTrace.arguments?.getInt("id") ?: 1
+                            PlayerDetailScreen(controller, innerPadding, playerId)
+                        }
                     }
                 }
             }
