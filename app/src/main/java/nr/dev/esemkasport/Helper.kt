@@ -1,9 +1,13 @@
 package nr.dev.esemkasport
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -38,7 +42,38 @@ data class User(
     val fullName: String,
     val username: String,
     val email: String,
+)
 
+data class Team(
+    val id: Int,
+    val name: String,
+    val about: String,
+    val kills: Int,
+    val deaths: Int,
+    val assists: Int,
+    val gold: Int,
+    val damage: Int,
+    val lordKills: Int,
+    val tortoiseKills: Int,
+    val towerDestroy: Int,
+    val logo500: String,
+    val logo256: String
+)
+
+data class PlayerRole(
+    val id: Int,
+    val name: String
+)
+
+data class Player(
+    val id: Int,
+    val playerRoleId: Int,
+    val teamId: Int,
+    val fullName: String,
+    val ign: String,
+    val image: String,
+    val playerRole: PlayerRole,
+    val team: Team
 )
 
 object HttpClient {
@@ -92,6 +127,25 @@ object HttpClient {
         }
     }
 
+    suspend fun fetchImg(url: String): ImageBitmap? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val res = send(HttpRequest(url = url), true)
+                if(res.code == 200 && res.bytes != null) {
+                    val bitmap = BitmapFactory.decodeByteArray(res.bytes, 0, res.bytes.size)
+                    bitmap.asImageBitmap()
+                } else {
+                    println("Img loading errCode: ${res.code}")
+                    null
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+
+    }
+
     suspend fun login(username: String, password: String): Int {
         val body = """{"usernameOrEmail": "$username", "password": "$password"}"""
         val res = withContext(Dispatchers.IO) {
@@ -136,6 +190,80 @@ object HttpClient {
         println(res)
         return res.code
     }
+
+    suspend fun getTeams(): List<Team> {
+        val res = withContext(Dispatchers.IO) {
+            send(HttpRequest(
+                url = address + "api/teams"
+            ))
+        }
+        if(res.code != 200 || res.body.isNullOrBlank()) return emptyList()
+        val jsonArr = JSONArray(res.body)
+        val teams = mutableListOf<Team>()
+        for(i in 0 until jsonArr.length()) {
+            val obj = jsonArr.getJSONObject(i)
+            teams.add(Team(
+                id = obj.getInt("id"),
+                name = obj.getString("name"),
+                about = obj.getString("about"),
+                kills = obj.getInt("kills"),
+                deaths = obj.getInt("deaths"),
+                assists = obj.getInt("assists"),
+                gold = obj.getInt("gold"),
+                damage = obj.getInt("damage"),
+                lordKills = obj.getInt("lordKills"),
+                tortoiseKills = obj.getInt("tortoiseKills"),
+                towerDestroy = obj.getInt("towerDestroy"),
+                logo500 = obj.getString("logo500"),
+                logo256 = obj.getString("logo256"),
+            ))
+        }
+        return teams
+    }
+
+    suspend fun getPlayers(): List<Player> {
+        val res = withContext(Dispatchers.IO) {
+            send(HttpRequest(
+                url = address + "api/players"
+            ))
+        }
+        if(res.code != 200 || res.body.isNullOrBlank()) return emptyList()
+        val jsonArr = JSONArray(res.body)
+        val players = mutableListOf<Player>()
+        for(i in 0 until jsonArr.length()) {
+            val obj = jsonArr.getJSONObject(i)
+            val teamObj = obj.getJSONObject("team")
+            val playerRoleObj = obj.getJSONObject("playerRole")
+            val team = Team(
+                id = teamObj.getInt("id"),
+                name = teamObj.getString("name"),
+                about = teamObj.getString("about"),
+                kills = teamObj.getInt("kills"),
+                deaths = teamObj.getInt("deaths"),
+                assists = teamObj.getInt("assists"),
+                gold = teamObj.getInt("gold"),
+                damage = teamObj.getInt("damage"),
+                lordKills = teamObj.getInt("lordKills"),
+                tortoiseKills = teamObj.getInt("tortoiseKills"),
+                towerDestroy = teamObj.getInt("towerDestroy"),
+                logo500 = teamObj.getString("logo500"),
+                logo256 = teamObj.getString("logo256"),
+            )
+            val playerRole = PlayerRole(id = playerRoleObj.getInt("id"), name = playerRoleObj.getString("name"))
+            players.add(Player(
+                id = obj.getInt("id"),
+                playerRoleId = obj.getInt("playerRoleId"),
+                teamId = obj.getInt("teamId"),
+                fullName = obj.getString("fullName"),
+                ign = obj.getString("ign"),
+                image = obj.getString("image"),
+                playerRole = playerRole,
+                team = team,
+            ))
+        }
+        return players
+    }
+
 }
 
 

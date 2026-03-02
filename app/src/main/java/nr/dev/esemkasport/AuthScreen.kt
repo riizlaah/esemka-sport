@@ -73,7 +73,7 @@ fun LoginScreen(modifier: Modifier, controller: NavHostController) {
     Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(R.drawable.left), tint = Color.Black, contentDescription = "Back", modifier = Modifier.clickable(onClick = {controller.popBackStack()}))
-            Text("Sign In", modifier.weight(1f), fontWeight = FontWeight.SemiBold)
+            Text("Sign In", modifier.weight(1f), fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
         }
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Text("Haloo, Selamat datang kembali!", fontWeight = FontWeight.Medium)
