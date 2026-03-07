@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
                             SignUpScreen(mod, controller)
                         }
                         composable(route = Route.HOME) {
-                            HomeScreen(controller, innerPadding)
+                            HomeScreen(controller, mod)
                         }
                         composable(
                             route = Route.TEAM_DETAIL_FULL,
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                             })
                         ) { backStackTrace ->
                             val teamId = backStackTrace.arguments?.getInt("id") ?: 1
-                            TeamDetailScreen(controller, innerPadding, teamId)
+                            TeamDetailScreen(controller, mod, teamId)
                         }
                         composable(
                             route = Route.PLAYER_DETAIL_FULL,
@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
                             })
                         ) { backStackTrace ->
                             val playerId = backStackTrace.arguments?.getInt("id") ?: 1
-                            PlayerDetailScreen(controller, innerPadding, playerId)
+                            PlayerDetailScreen(controller, mod, playerId)
                         }
                     }
                 }

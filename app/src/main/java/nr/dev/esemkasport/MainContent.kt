@@ -56,7 +56,7 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
+fun HomeScreen(controller: NavHostController, modifier: Modifier) {
     var datetime by remember { mutableStateOf("") }
     var search by remember { mutableStateOf("") }
     val tabs = listOf("Tim", "Pemain")
@@ -96,15 +96,7 @@ fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
         }
     }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(padVal)
-            .background(
-                Color.White
-            )
-    ) {
+    Column(modifier) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -243,7 +235,7 @@ fun HomeScreen(controller: NavHostController, padVal: PaddingValues) {
 }
 
 @Composable
-fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamId: Int) {
+fun TeamDetailScreen(controller: NavHostController, modifier: Modifier, teamId: Int) {
     val tabs = listOf("Tentang", "Prestasi", "Statistik", "Pemain")
     var selectedTab by remember { mutableStateOf(tabs[0]) }
     var team by remember { mutableStateOf<Team?>(null) }
@@ -258,15 +250,7 @@ fun TeamDetailScreen(controller: NavHostController, padVal: PaddingValues, teamI
         }
     }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(padVal)
-            .background(
-                MaterialTheme.colorScheme.tertiary
-            )
-    ) {
+    Column(modifier) {
         BackHeader(controller, "Detail Tim", TextAlign.Left)
         Column(Modifier.weight(1f)) {
             if (team == null) return@Column
@@ -488,7 +472,7 @@ fun PlayerCard(player: Player, controller: NavHostController) {
 }
 
 @Composable
-fun PlayerDetailScreen(controller: NavHostController, padVal: PaddingValues, playerId: Int) {
+fun PlayerDetailScreen(controller: NavHostController, modifier: Modifier, playerId: Int) {
     var player by remember { mutableStateOf<Player?>(null) }
 
     LaunchedEffect(Unit) {
@@ -497,16 +481,7 @@ fun PlayerDetailScreen(controller: NavHostController, padVal: PaddingValues, pla
         }
     }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(padVal)
-            .background(
-                MaterialTheme.colorScheme.tertiary
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(modifier) {
         BackHeader(controller, "Detail Pemain", TextAlign.Left)
         if (player == null) return@Column
         LazyColumn(
